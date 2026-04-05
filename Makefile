@@ -1,17 +1,127 @@
+# Default shell
+SHELL := /bin/bash
+
+# Default goal
+.DEFAULT_GOAL := never
+
+# Options
+export DEBIAN_FRONTEND := noninteractive
+
+# Goals
+.PHONY: commit
+commit: distclean update fix check
+
+.PHONY: fix
+fix: eslint_fix prettier_fix yq_fix
+
+.PHONY: check
+check: lint stan test audit
+
+.PHONY: lint
+lint: eslint_check prettier_check
+
+.PHONY: stan
+stan: typescript_check
+
+.PHONY: test
+test:
+
+.PHONY: audit
+audit: npm_audit
+
+.PHONY: install
+install: npm_install
+
+.PHONY: update
+update: npm_update
+
+.PHONY: clean
+clean:
+	rm -rf ./node_modules
+
+.PHONY: distclean
+distclean: clean
+	git clean -Xfd
+
+.PHONY: eslint_fix
+eslint_fix: ./node_modules ./eslint.config.js
+	npm exec --ignore-scripts -- eslint --concurrency=auto --fix .
+
+.PHONY: prettier_fix
+prettier_fix: ./node_modules ./prettier.config.js
+	npm exec --ignore-scripts -- prettier -w .
+
+.PHONY: yq_fix
+yq_fix:
+	find . -type f -name "*.yml" -exec yq -i 'sort_keys(..)' {} \;
+
+.PHONY: eslint_check
+eslint_check: ./node_modules ./eslint.config.js
+	npm exec --ignore-scripts -- eslint --concurrency=auto .
+
+.PHONY: prettier_check
+prettier_check: ./node_modules ./prettier.config.js
+	npm exec --ignore-scripts -- prettier -c .
+
+.PHONY: typescript_check
+typescript_check: ./node_modules ./tsconfig.json
+	npm exec --ignore-scripts -- tsc --noEmit
+
+.PHONY: npm_audit
+npm_audit: ./node_modules ./package.json ./package-lock.json
+	npm audit --ignore-scripts --audit-level=critical --install-links --include=prod --include=dev --include=peer --include=optional
+
+.PHONY: npm_install
+npm_install: ./package.json ./package-lock.json
+	npm install --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
+
+.PHONY: npm_update
+npm_update: ./package.json
+	rm -rf ./node_modules
+	rm -rf ./package-lock.json
+	npm update --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
+
 .PHONY: postcreate
-postcreate:
-	npm run npm:install:development
-	npm run build
+postcreate: install
 
-.PHONY: start
-start:
-	npm run build
-	npm run start
+.PHONY: start serve server dev
+start serve server dev: ./node_modules ./dist/index.js ./package.json ./package-lock.json tsc
+	node ./dist/index.js
 
-.PHONY: composeclean
-composeclean:
-	docker compose down --remove-orphans
+.PHONY: image
+image:
+	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml build --pull --push
 
-.PHONY: composeclear
-composeclear: composeclean
-	docker compose down --volumes --remove-orphans
+.PHONY: deploy
+deploy:
+	docker stack deploy -c ./docker-compose.yml -c ./docker-compose-swarm.yml --with-registry-auth --prune --detach=false --resolve-image=always ${CI_PROJECT_PATH_SLUG:-template-express-api}
+
+.PHONY: up
+up:
+	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml up --build --remove-orphans --always-recreate-deps --force-recreate --pull=always --renew-anon-volumes
+
+.PHONY: down
+down:
+	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml down --remove-orphans --rmi=local
+
+.PHONY: password
+password:
+	@tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
+
+.PHONY: secret
+secret:
+	@tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 64
+
+.PHONY: devcontainer
+devcontainer:
+	devcontainer up
+	devcontainer exec /bin/bash || true
+	docker compose -f ./docker-compose-devcontainer.yml down --remove-orphans --rmi=local
+
+.PHONY: tsc
+tsc: ./node_modules ./tsconfig.json
+	npm exec --ignore-scripts -- tsc
+
+# Dependencies
+./package-lock.json ./node_modules: ./package.json
+	${MAKE} npm_update

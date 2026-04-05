@@ -7,9 +7,9 @@ import cookieParser from 'cookie-parser';
 import type { ErrorRequestHandler, Express, RequestHandler } from 'express';
 import express from 'express';
 
-const logger = logs.getLogger('logs');
-
 const PORT: number = parseInt(process.env['PORT'] ?? '8080', 10);
+
+const logger = logs.getLogger('logs');
 const app: Express = express();
 
 app.disable('x-powered-by');
@@ -73,6 +73,12 @@ const handleOpenapi: RequestHandler = (_req, res) => {
 app.get('/api/v1/spec', handleOpenapi);
 
 app.use('/static', express.static('static'));
+
+const handleHealthzLive: RequestHandler = (_req, res) => {
+  res.status(200).send();
+};
+
+app.get('/healthz/live', handleHealthzLive);
 
 const handleNotFound: RequestHandler = (_req, res, next) => {
   if (res.headersSent) {

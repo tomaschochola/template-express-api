@@ -1,7 +1,14 @@
 {
+  "containerUser": "node",
   "customizations": {
     "vscode": {
-      "extensions": ["ms-azuretools.vscode-containers", "EditorConfig.EditorConfig", "ms-vscode.makefile-tools", "Tyriar.sort-lines"],
+      "extensions": [
+        "EditorConfig.EditorConfig",
+        "Tyriar.sort-lines",
+        "docker.docker",
+        "ms-azuretools.vscode-containers",
+        "ms-vscode.makefile-tools"
+      ],
       "settings": {
         "editor.codeActionsOnSave": {
           "source.organizeImports": "always",
@@ -14,9 +21,12 @@
       }
     }
   },
-  "dockerComposeFile": ["../docker-compose.yaml", "./docker-compose.yaml"],
+  "dockerComposeFile": [
+    "../docker-compose-devcontainer.yml"
+  ],
+  "init": true,
   "postCreateCommand": "make postcreate",
-  "runServices": ["devcontainer"],
+  "remoteUser": "node",
   "service": "devcontainer",
-  "workspaceFolder": "/workspaces"
+  "workspaceFolder": "/workspace"
 }

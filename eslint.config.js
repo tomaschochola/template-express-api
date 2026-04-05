@@ -1,18 +1,32 @@
-import { EslintStack } from '@premierstacks/eslint-stack';
+/**
+ * @file
+ * @author Tomáš Chochola <tomaschochola@tomaschochola.cz>
+ * @copyright © 2026 Tomáš Chochola <tomaschochola@tomaschochola.cz>
+ *
+ * @license CC-BY-ND-4.0
+ *
+ * @see {@link https://creativecommons.org/licenses/by-nd/4.0/} License
+ * @see {@link https://github.com/tomaschochola} GitHub Profile
+ * @see {@link https://github.com/sponsors/tomaschochola} GitHub Sponsors
+ */
+
+import { Eslint, selectors } from '@tomaschochola/tooling-eslint';
 import globals from 'globals';
 
 // eslint-disable-next-line no-restricted-exports
-export default EslintStack.create()
-  .base()
+export default new Eslint()
+  .add({
+    files: [...selectors.globalEcmaScript],
+  })
   .globals({
     ...globals.node,
     ...globals.es2024,
   })
-  .ignores([...EslintStack.Selectors.GlobalIgnore])
-  .ignores(['dist'])
+  .ignores()
+  .ignores(['node_modules', 'dist'])
   .recommended()
-  .typescript({ files: [...EslintStack.Selectors.GlobalTypeScript, ...EslintStack.Selectors.GlobalTypedReact] })
+  .typescript()
   .stylistic()
   .sonarjs()
-  .typescriptDisabled({ files: [...EslintStack.Selectors.GlobalJavaScript, ...EslintStack.Selectors.GlobalReact] })
+  .typescriptDisabled({ files: [...selectors.rootEcmaScript] })
   .build();

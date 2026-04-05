@@ -2,21 +2,23 @@
 
 ## Tomáš Chochola
 
-**Creator of Premierstacks**
+**Solution Architect and Lead Engineer**
 
-Tomáš Chochola is a software architect, technical leader, and creator of the Premierstacks ecosystem. With years of experience in backend and frontend development, cloud infrastructure, and team management, he has established a reputation for delivering scalable, maintainable, and robust software solutions.
+Tomáš Chochola serves as the principal architect and creator of this software ecosystem. His professional background encompasses executive technical leadership and high level enterprise architecture where precision and long term stability are paramount.
 
-His expertise spans backend systems built on PHP and Laravel, frontend interfaces designed with React and Material Design 3, and efficient workflows powered by modern tooling and infrastructure solutions.
+The engineering philosophy applied here draws directly from the foundational era of computer science. It respects the discipline required by low level environments where resource constraints demanded absolute understanding of the machine. This rigor is transposed into modern development stacks ranging from system level programming in Rust and Go to complex distributed systems in PHP and TypeScript.
 
-### Specializations
+Every component in this repository is crafted with an uncompromising focus on performance and correctness. The code rejects the modern tendency to rely on abstraction layers that hide complexity and introduce overhead. Instead it enforces explicit data flow and strict typing to guarantee deterministic behavior under any load.
 
-**Backend Development:** PHP, Laravel, JSON:API<br />
-**Frontend Development:** TypeScript, React, Material Design 3<br />
-**Tooling:** ESLint, Prettier, Webpack, PHPStan, PHP CS Fixer, Stylelint<br />
+This work targets environments where quality and maintainability are the only metrics that matter. It is designed for engineers who require absolute control over their infrastructure and possess the expertise to manage strictly typed and highly optimized systems.
 
 ### Contact
 
-**📧 Email: <chocholatom1997@gmail.com>**<br />
-**👨 GitHub Personal: [https://github.com/tomchochola](https://github.com/tomchochola)**<br />
-**🏢 GitHub Organization: [https://github.com/premierstacks](https://github.com/premierstacks)**<br />
-**💰 GitHub Sponsors: [https://github.com/sponsors/tomchochola](https://github.com/sponsors/tomchochola)**<br />
+**Email**<br />
+tomaschochola@tomaschochola.cz
+
+**GitHub Profile**<br />
+https://github.com/tomaschochola
+
+**Sponsorship**<br />
+https://github.com/sponsors/tomaschochola

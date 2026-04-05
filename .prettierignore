@@ -9,21 +9,22 @@
 /node_modules
 /package-lock.json
 
+# environment files and secrets
+/.env
+/.secrets
+
 # compiled files
 /dist
-
-# environment files
-.env
 
 # svg
 *.svg
 
 # eslint
-*.tsx
-*.mts
-*.ts
+*.cjs
 *.cts
+*.js
 *.jsx
 *.mjs
-*.js
-*.cjs
+*.mts
+*.ts
+*.tsx

@@ -1,34 +1,55 @@
 # syntax=docker/dockerfile:1
 
-ARG NODE_VERSION=24-trixie
-ARG DEVCONTAINER_VERSION=24-trixie
+FROM node:24-trixie AS versionednode
 
-FROM node:${NODE_VERSION} AS base
+FROM versionednode AS base
+WORKDIR /workspace
 ENV APP_ENV=production
-ENV APP_PORT=8080
 ENV NODE_ENV=production
-WORKDIR /workspaces
+RUN <<EOF
+  set -euo pipefail
+  apt-get update -y
+  apt-get upgrade -y --no-install-recommends
+  apt-get autoremove -y
+  apt-get autoclean -y
+  apt-get clean -y
+  rm -rf /var/lib/apt/lists/*
+EOF
 
 FROM base AS development_deps
-COPY ./package.json ./
-RUN npm run npm:install:development
+COPY ./package* ./
+RUN npm install --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
 
 FROM base AS production_deps
-COPY ./package.json ./
-RUN npm run npm:install:production
+COPY ./package* ./
+RUN npm install --ignore-scripts --install-links --include=prod --omit=dev --include=peer --include=optional
 
 FROM development_deps AS build
 COPY ./ ./
-RUN npm run build
+RUN npm exec --ignore-scripts -- tsc
 
-FROM base AS runtime
-COPY --from=production_deps /workspaces/package.json ./
-COPY --from=production_deps /workspaces/package-lock.json ./
-COPY --from=production_deps /workspaces/node_modules ./node_modules
-COPY --from=build /workspaces/dist ./dist
-COPY --from=build /workspaces/static ./static
-COPY --from=build /workspaces/views ./views
+FROM base AS server
+COPY --from=production_deps /workspace/package.json ./
+COPY --from=production_deps /workspace/package-lock.json ./
+COPY --from=production_deps /workspace/node_modules ./node_modules
+COPY --from=build /workspace/dist ./dist
+COPY --from=build /workspace/static ./static
+COPY --from=build /workspace/views ./views
 CMD ["node", "./dist/index.js"]
 
-FROM mcr.microsoft.com/devcontainers/typescript-node:${DEVCONTAINER_VERSION} AS devcontainer
-WORKDIR /workspaces
+FROM base AS devcontainer
+ENV APP_ENV=local
+ENV NODE_ENV=development
+RUN <<EOF
+  set -euo pipefail
+  apt-get update -y
+  apt-get upgrade -y --no-install-recommends
+  apt-get install -y --no-install-recommends ca-certificates curl wget build-essential git zip unzip
+  wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+  chmod +x /usr/local/bin/yq
+  apt-get autoremove -y
+  apt-get autoclean -y
+  apt-get clean -y
+  rm -rf /var/lib/apt/lists/*
+EOF
+USER node
