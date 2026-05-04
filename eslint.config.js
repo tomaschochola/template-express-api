@@ -10,23 +10,11 @@
  * @see {@link https://github.com/sponsors/tomaschochola} GitHub Sponsors
  */
 
-import { Eslint, selectors } from '@tomaschochola/tooling-eslint';
-import globals from 'globals';
+import { ESLint } from '@tomaschochola/tooling-eslint';
 
 // eslint-disable-next-line no-restricted-exports
-export default new Eslint()
-  .add({
-    files: [...selectors.globalEcmaScript],
-  })
-  .globals({
-    ...globals.node,
-    ...globals.es2024,
-  })
-  .ignores()
-  .ignores(['node_modules', 'dist'])
-  .recommended()
-  .typescript()
-  .stylistic()
-  .sonarjs()
-  .typescriptDisabled({ files: [...selectors.rootEcmaScript] })
-  .build();
+export default new ESLint()
+  .presetNode({ presetDefaultsOptions: { configNodeModulesIgnores: false } })
+  .configIgnores(['node_modules', 'dist'])
+  .presetTypeScript()
+  .buildConfig();
