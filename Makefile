@@ -102,21 +102,13 @@ up:
 
 .PHONY: down
 down:
-	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml down --remove-orphans --rmi=local
-
-.PHONY: password
-password:
-	@tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 32
-
-.PHONY: secret
-secret:
-	@tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 64
+	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml down --remove-orphans
 
 .PHONY: devcontainer
 devcontainer:
 	devcontainer up
 	devcontainer exec /bin/bash || true
-	docker compose -f ./docker-compose-devcontainer.yml down --remove-orphans --rmi=local
+	docker compose -f ./docker-compose-devcontainer.yml down --remove-orphans
 
 .PHONY: tsc
 tsc: ./node_modules ./tsconfig.json
