@@ -43,7 +43,7 @@ services:
       nofile:
         hard: 1048576
         soft: 1048576
-    user: 'node'
+    user: 'node:node'
     volumes:
       - target: '/tmp'
         tmpfs:

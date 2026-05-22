@@ -1,6 +1,8 @@
 networks:
   devcontainer:
     internal: false
+volumes:
+  npm-cache:
 services:
   devcontainer:
     build:
@@ -10,11 +12,13 @@ services:
     command: 'sleep infinity'
     environment:
       APP_ENV: 'local'
+      NPM_CONFIG_CACHE: '/home/node/.npm'
       NODE_ENV: 'development'
     networks:
       - 'devcontainer'
     ports:
       - '8080:8080'
-    user: 'node'
+    user: 'node:node'
     volumes:
       - './:/workspace'
+      - 'npm-cache:/home/node/.npm'

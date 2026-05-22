@@ -6,7 +6,6 @@ SHELL := /bin/bash
 
 # Options
 export DEBIAN_FRONTEND := noninteractive
-
 # Goals
 .PHONY: commit
 commit: distclean update fix check
@@ -92,23 +91,35 @@ start serve server dev: ./node_modules ./dist/index.js ./package.json ./package-
 image:
 	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml build --pull --push
 
+.PHONY: trivy
+trivy:
+	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml build --pull
+	@set -eo pipefail; \
+		docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml config --images | sort -u | \
+		xargs -r -n 1 docker run --rm --pull missing \
+			--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
+			--mount type=volume,source=trivy-cache,target=/root/.cache \
+			aquasec/trivy:latest image \
+			--exit-code 1 \
+			--severity HIGH,CRITICAL
+
 .PHONY: deploy
 deploy:
-	docker stack deploy -c ./docker-compose.yml -c ./docker-compose-swarm.yml --with-registry-auth --prune --detach=false --resolve-image=always ${CI_PROJECT_PATH_SLUG:-template-express-api}
+	docker stack deploy -c ./docker-compose.yml -c ./docker-compose-swarm.yml --with-registry-auth --prune --detach=false --resolve-image=always $${CI_PROJECT_PATH_SLUG:-template-express-api}
 
 .PHONY: up
 up:
 	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml up --build --remove-orphans --always-recreate-deps --force-recreate --pull=always --renew-anon-volumes
 
-.PHONY: down
-down:
-	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml down --remove-orphans
+.PHONY: stop
+stop:
+	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml stop
 
 .PHONY: devcontainer
 devcontainer:
 	devcontainer up
 	devcontainer exec /bin/bash || true
-	docker compose -f ./docker-compose-devcontainer.yml down --remove-orphans
+	docker ps -q --filter "label=devcontainer.local_folder=$${PWD}" | xargs -r docker stop
 
 .PHONY: tsc
 tsc: ./node_modules ./tsconfig.json

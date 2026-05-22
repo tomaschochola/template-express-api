@@ -15,26 +15,28 @@ RUN <<EOF
   apt-get clean -y
   rm -rf /var/lib/apt/lists/*
 EOF
+RUN chown node:node /workspace
+USER node
 
 FROM base AS development_deps
-COPY ./package* ./
+COPY --chown=node:node ./package* ./
 RUN npm install --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
 
 FROM base AS production_deps
-COPY ./package* ./
+COPY --chown=node:node ./package* ./
 RUN npm install --ignore-scripts --install-links --include=prod --omit=dev --include=peer --include=optional
 
 FROM development_deps AS build
-COPY ./ ./
+COPY --chown=node:node ./ ./
 RUN npm exec --ignore-scripts -- tsc
 
 FROM base AS server
-COPY --from=production_deps /workspace/package.json ./
-COPY --from=production_deps /workspace/package-lock.json ./
-COPY --from=production_deps /workspace/node_modules ./node_modules
-COPY --from=build /workspace/dist ./dist
-COPY --from=build /workspace/static ./static
-COPY --from=build /workspace/views ./views
+COPY --chown=node:node --from=production_deps /workspace/package.json ./
+COPY --chown=node:node --from=production_deps /workspace/package-lock.json ./
+COPY --chown=node:node --from=production_deps /workspace/node_modules ./node_modules
+COPY --chown=node:node --from=build /workspace/dist ./dist
+COPY --chown=node:node --from=build /workspace/static ./static
+COPY --chown=node:node --from=build /workspace/views ./views
 CMD ["node", "./dist/index.js"]
 
 FROM base AS devcontainer
