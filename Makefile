@@ -80,6 +80,10 @@ npm_update: ./package.json
 	rm -rf ./package-lock.json
 	npm update --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
 
+.PHONY: precreate
+precreate:
+	docker volume create tomaschochola-npm-cache >/dev/null
+
 .PHONY: postcreate
 postcreate: install
 
@@ -99,7 +103,7 @@ trivy:
 		xargs -r -n 1 docker run --rm --pull missing \
 			--mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
 			--mount type=volume,source=trivy-cache,target=/root/.cache \
-			aquasec/trivy:latest image \
+			docker.io/aquasec/trivy:latest image \
 			--exit-code 1 \
 			--severity HIGH,CRITICAL
 
@@ -116,7 +120,7 @@ stop:
 	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml stop
 
 .PHONY: devcontainer
-devcontainer:
+devcontainer: precreate
 	devcontainer up
 	devcontainer exec /bin/bash || true
 	docker ps -q --filter "label=devcontainer.local_folder=$${PWD}" | xargs -r docker stop

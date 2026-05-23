@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:24-trixie AS versionednode
+FROM docker.io/library/node:24-trixie AS versionednode
 
 FROM versionednode AS base
 WORKDIR /workspace
@@ -16,6 +16,7 @@ RUN <<EOF
   rm -rf /var/lib/apt/lists/*
 EOF
 RUN chown node:node /workspace
+RUN install -d -o node -g node /home/node/.npm
 USER node
 
 FROM base AS development_deps
@@ -40,6 +41,7 @@ COPY --chown=node:node --from=build /workspace/views ./views
 CMD ["node", "./dist/index.js"]
 
 FROM base AS devcontainer
+USER root
 ENV APP_ENV=local
 ENV NODE_ENV=development
 RUN <<EOF
