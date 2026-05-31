@@ -27,8 +27,6 @@ services:
         max-size: '10m'
     networks:
       - 'server'
-    ports:
-      - '8080:8080'
     read_only: true
     restart: 'unless-stopped'
     security_opt:
