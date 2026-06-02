@@ -19,7 +19,7 @@ import cookieParser from 'cookie-parser';
 import type { ErrorRequestHandler, Express, RequestHandler } from 'express';
 import express from 'express';
 
-const PORT: number = parseInt(process.env['PORT'] ?? '8080', 10);
+const PORT: number = parseInt(process.env['PORT'] ?? '61400', 10);
 
 const logger = logs.getLogger('logs');
 const app: Express = express();

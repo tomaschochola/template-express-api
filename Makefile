@@ -119,9 +119,17 @@ up:
 stop:
 	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml stop
 
-.PHONY: port
-port:
-	@set -o pipefail; project="$$(docker ps --filter 'label=devcontainer.local_folder=$(CURDIR)' --filter 'label=devcontainer.config_file=$(CURDIR)/.devcontainer/devcontainer.json' --format '{{.Label "com.docker.compose.project"}}' | head -n1)"; docker ps -q --filter "label=com.docker.compose.project=$$project" --filter 'label=com.docker.compose.service=devcontainer' | head -n1 | xargs -r -I{} docker port {} 8080/tcp | awk -F: 'NR==1 { print "http://127.0.0.1:" $$NF; ok=1 } END { exit !ok }'
+.PHONY: port ports
+port ports:
+	@printf '\033[1m%-80s\033[0m\n' 'template-express-api ports'
+	@printf '%-80s\n' '--------------------------------------------------------------------------------'
+	@printf '\033[1m%-12s %-21s %-12s %-20s\033[0m\n' 'Kind' 'Host' 'Container' 'Service'
+	@printf '%-12s %-21s %-12s %-20s\n' 'express' '-' '61400' 'server'
+	@printf '%-12s %-21s %-12s %-20s\n' 'express' '127.0.0.1:61400' '61400' 'devcontainer'
+	@printf '%-80s\n' '--------------------------------------------------------------------------------'
+	@printf '\n\033[1mLinks\033[0m\n'
+	@printf '%s\n' 'Express server: http://127.0.0.1:61400/'
+	@printf '%s\n' 'Express health: http://127.0.0.1:61400/healthz/live'
 
 .PHONY: devcontainer
 devcontainer: precreate
