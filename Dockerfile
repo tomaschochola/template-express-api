@@ -49,8 +49,6 @@ RUN <<EOF
   apt-get update -y
   apt-get upgrade -y --no-install-recommends
   apt-get install -y --no-install-recommends ca-certificates curl wget build-essential git zip unzip
-  wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-  chmod +x /usr/local/bin/yq
   apt-get autoremove -y
   apt-get autoclean -y
   apt-get clean -y

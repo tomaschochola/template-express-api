@@ -27,5 +27,5 @@ services:
         monitor: '60s'
         order: 'stop-first'
         parallelism: 1
-    image: '${CI_REGISTRY_IMAGE:-oci.localhost}/server:${CI_COMMIT_REF_SLUG:-local}-${CI_COMMIT_SHA:-latest}'
+    image: '${CI_REGISTRY_IMAGE:-oci.localhost}/server:${CI_COMMIT_REF_SLUG:-local}-${CI_COMMIT_SHA:-dev}'
     user: 'node:node'
