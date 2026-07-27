@@ -105,7 +105,6 @@ eslint_fix: ./node_modules ./package.json ./package-lock.json ./eslint.config.js
 prettier_fix: ./node_modules ./package.json ./package-lock.json ./prettier.config.js
 	npm exec --ignore-scripts -- prettier -w .
 
-
 .PHONY: eslint_check
 eslint_check: ./node_modules ./package.json ./package-lock.json ./eslint.config.js
 	npm exec --ignore-scripts -- eslint --concurrency=auto .
