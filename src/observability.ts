@@ -21,7 +21,11 @@ const sdk = new NodeSDK({
   metricReader: new PeriodicExportingMetricReader({
     exporter: new ConsoleMetricExporter(),
   }),
-  logRecordProcessors: [new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())],
+  logRecordProcessors: [
+    new SimpleLogRecordProcessor({
+      exporter: new ConsoleLogRecordExporter(),
+    }),
+  ],
   instrumentations: [getNodeAutoInstrumentations()],
 });
 

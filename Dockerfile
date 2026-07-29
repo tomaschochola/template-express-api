@@ -8,6 +8,7 @@ ENV APP_ENV=production
 ENV NODE_ENV=production
 RUN <<EOF
   set -euo pipefail
+  export DEBIAN_FRONTEND=noninteractive
   apt-get update -y
   apt-get upgrade -y --no-install-recommends
   apt-get autoremove -y
@@ -46,6 +47,7 @@ ENV APP_ENV=local
 ENV NODE_ENV=development
 RUN <<EOF
   set -euo pipefail
+  export DEBIAN_FRONTEND=noninteractive
   apt-get update -y
   apt-get upgrade -y --no-install-recommends
   apt-get install -y --no-install-recommends ca-certificates curl wget build-essential git zip unzip

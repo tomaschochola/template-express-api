@@ -18,10 +18,6 @@ MAKEFLAGS += --no-builtin-variables
 
 .DEFAULT_GOAL := help
 
-# Options
-
-export DEBIAN_FRONTEND := noninteractive
-
 # Goals
 
 .PHONY: help
@@ -176,8 +172,8 @@ port ports:
 
 .PHONY: devcontainer
 devcontainer: precreate
-	devcontainer up
-	devcontainer exec /bin/bash || true
+	devcontainer up --workspace-folder .
+	devcontainer exec --workspace-folder . /bin/bash || true
 	docker ps -q --filter "label=devcontainer.local_folder=$${PWD}" | xargs -r docker stop
 
 .PHONY: tsc

@@ -41,12 +41,13 @@ const setSecurityHeaders: RequestHandler = (_req, res, next) => {
   }
 
   res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  res.setHeader('X-Frame-Options', 'deny');
+  res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader(
     'Content-Security-Policy',
-    'default-src \'self\'; form-action \'self\'; base-uri \'self\'; object-src \'none\'; style-src \'self\'; font-src \'self\'; frame-ancestors \'none\'; upgrade-insecure-requests; block-all-mixed-content',
+    'default-src \'self\'; form-action \'self\'; base-uri \'self\'; object-src \'none\'; style-src \'self\'; font-src \'self\'; frame-ancestors \'none\'; upgrade-insecure-requests',
   );
+  res.setHeader('X-DNS-Prefetch-Control', 'off');
   res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   res.setHeader('Referrer-Policy', 'no-referrer');
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
@@ -54,7 +55,7 @@ const setSecurityHeaders: RequestHandler = (_req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
   res.setHeader(
     'Permissions-Policy',
-    'accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(self), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), unload=()',
+    'accelerometer=(), autoplay=(), camera=(), cross-origin-isolated=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), hid=(), idle-detection=(), serial=(), unload=()',
   );
 
   next();
