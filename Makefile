@@ -14,51 +14,20 @@ MAKEFLAGS += --no-builtin-variables
 .SUFFIXES:
 .NOTPARALLEL:
 
+DEVCONTAINER_PROJECT := template-express-api-devcontainer
+DEVCONTAINER_FILTER := label=com.docker.compose.project=$(DEVCONTAINER_PROJECT)
+
 # Default goal
 
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := never
+
+.PHONY: never
+.SILENT: never
+never:
+	printf '%s\n' 'No default target. Run an explicit target' >&2
+	exit 1
 
 # Goals
-
-.PHONY: help
-.SILENT: help
-help:
-	printf '\033[1m%s\033[0m\n' "$${PWD##*/} targets"
-	printf '%s\n' '--------------------------------------------------------------------------------'
-	printf '\033[1m%-16s\033[0m  %s\n' 'help' 'Show this help.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'all' 'Build final project artifacts for release.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'fix' 'Run all automatic fixers.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'check' 'Run lint, static analysis, tests, and audits.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'lint' 'Run code style checks.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'static' 'Run static analysis.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'audit' 'Run dependency/security audits.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'deps_install' 'Install dependencies from current lock files.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'deps_update' 'Refresh dependencies and generated lock files.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'clean' 'Remove generated build, dependency, and test artifacts.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'distclean' 'Run clean and remove generated lock files.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'eslint_fix' 'Fix JavaScript/TypeScript lint issues with ESLint.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'prettier_fix' 'Format files with Prettier.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'eslint_check' 'Check JavaScript/TypeScript with ESLint.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'prettier_check' 'Check formatting with Prettier.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'typescript_check' 'Run TypeScript type checking.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'npm_audit' 'Run npm audit at the configured severity level.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'npm_install' 'Install npm dependencies from package-lock.json.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'npm_update' 'Refresh npm dependencies and package-lock.json.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'precreate' 'Run pre-devcontainer setup hooks.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'postcreate' 'Run post-devcontainer setup hooks.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'build' 'Build project artifacts.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'start' 'Start the local development server.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'serve' 'Alias for start.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'server' 'Alias for start.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'dev' 'Alias for start.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'compose_push' 'Build and push Docker Compose images.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'swarm_deploy' 'Deploy the stack to Docker Swarm.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'compose_up' 'Start the Docker Compose environment.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'compose_stop' 'Stop the Docker Compose environment.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'port' 'Print local service ports.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'ports' 'Alias for port.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'devcontainer' 'Open a devcontainer shell, then stop the container.'
-	printf '\033[1m%-16s\033[0m  %s\n' 'tsc' 'Compile/check TypeScript with tsc.'
 
 .PHONY: all
 all: build
@@ -86,12 +55,17 @@ deps_update: npm_update
 
 .PHONY: clean
 clean:
-	rm -rf ./node_modules
 	rm -rf ./dist
 
+.PHONY: deps_clean
+deps_clean:
+	rm -rf ./node_modules
+
 .PHONY: distclean
-distclean: clean
-	rm -rf ./package-lock.json
+distclean: clean deps_clean
+
+.PHONY: nuke
+nuke: distclean data_reset
 
 .PHONY: eslint_fix
 eslint_fix: ./node_modules ./package.json ./package-lock.json ./eslint.config.js
@@ -111,7 +85,7 @@ prettier_check: ./node_modules ./package.json ./package-lock.json ./prettier.con
 
 .PHONY: typescript_check
 typescript_check: ./node_modules ./package.json ./package-lock.json ./tsconfig.json
-	npm exec --ignore-scripts -- tsc --noEmit
+	npm exec --ignore-scripts -- tsc --noEmit --project ./tsconfig.json
 
 .PHONY: npm_audit
 npm_audit: ./node_modules ./package.json ./package-lock.json
@@ -119,12 +93,11 @@ npm_audit: ./node_modules ./package.json ./package-lock.json
 
 .PHONY: npm_install
 npm_install: ./package.json ./package-lock.json
-	npm install --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
+	npm ci --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
 
 .PHONY: npm_update
 npm_update: ./package.json
 	rm -rf ./node_modules
-	rm -rf ./package-lock.json
 	npm update --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
 
 .PHONY: precreate
@@ -135,7 +108,8 @@ precreate:
 postcreate: deps_install
 
 .PHONY: build
-build: tsc
+build: ./node_modules ./package.json ./package-lock.json ./tsconfig.json
+	npm exec --ignore-scripts -- tsc --project ./tsconfig.json
 
 .PHONY: start serve server dev
 start serve server dev: build
@@ -157,30 +131,43 @@ compose_up:
 compose_stop:
 	docker compose -f ./docker-compose.yml -f ./docker-compose-swarm.yml stop
 
-.PHONY: port ports
-.SILENT: port ports
-port ports:
-	printf '\033[1m%-80s\033[0m\n' 'template-express-api ports'
-	printf '%-80s\n' '--------------------------------------------------------------------------------'
-	printf '\033[1m%-12s %-21s %-12s %-20s\033[0m\n' 'Kind' 'Host' 'Container' 'Service'
-	printf '%-12s %-21s %-12s %-20s\n' 'express' '-' '61400' 'server'
-	printf '%-12s %-21s %-12s %-20s\n' 'express' '127.0.0.1:61400' '61400' 'devcontainer'
-	printf '%-80s\n' '--------------------------------------------------------------------------------'
-	printf '\n\033[1mLinks\033[0m\n'
-	printf '%s\n' 'Express server: http://127.0.0.1:61400/'
-	printf '%s\n' 'Express health: http://127.0.0.1:61400/healthz/live'
-
 .PHONY: devcontainer
-devcontainer: precreate
+devcontainer:
 	devcontainer up --workspace-folder .
-	devcontainer exec --workspace-folder . /bin/bash || true
-	docker ps -q --filter "label=devcontainer.local_folder=$${PWD}" | xargs -r docker stop
+	devcontainer exec --workspace-folder . /bin/bash
 
-.PHONY: tsc
-tsc: ./node_modules ./package.json ./package-lock.json ./tsconfig.json
-	npm exec --ignore-scripts -- tsc
+.PHONY: status
+status:
+	docker container ls --all --filter "$(DEVCONTAINER_FILTER)"
+	docker volume ls --filter "$(DEVCONTAINER_FILTER)"
+	docker network ls --filter "$(DEVCONTAINER_FILTER)"
+
+.PHONY: stop
+stop:
+	docker container ls --quiet --filter "$(DEVCONTAINER_FILTER)" | while IFS= read -r container; do docker container stop "$$container"; done
+
+.PHONY: restart
+restart:
+	docker container ls --all --quiet --filter "$(DEVCONTAINER_FILTER)" | while IFS= read -r container; do docker container restart "$$container"; done
+
+.PHONY: down
+down: stop
+	docker container ls --all --quiet --filter "$(DEVCONTAINER_FILTER)" | while IFS= read -r container; do docker container rm --force --volumes "$$container"; done
+	docker network ls --quiet --filter "$(DEVCONTAINER_FILTER)" | while IFS= read -r network; do docker network rm "$$network"; done
+
+.PHONY: rebuild
+rebuild: down
+	devcontainer up --workspace-folder .
+
+.PHONY: rebuild_no_cache
+rebuild_no_cache: down
+	devcontainer up --workspace-folder . --build-no-cache
+
+.PHONY: data_reset
+data_reset: down
+	docker volume ls --quiet --filter "$(DEVCONTAINER_FILTER)" | while IFS= read -r volume; do docker volume rm "$$volume"; done
 
 # Dependencies
 
-./package-lock.json ./node_modules &: ./package.json
-	${MAKE} npm_update
+./node_modules: ./package.json ./package-lock.json
+	${MAKE} npm_install

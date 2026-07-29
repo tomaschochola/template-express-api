@@ -12,9 +12,5 @@
 # environment files and secrets
 /.env
 /.secrets
-
-# temporary
-/package-lock.json
-
 # compiled files
 /dist

@@ -22,11 +22,11 @@ USER node
 
 FROM base AS development_deps
 COPY --chown=node:node ./package* ./
-RUN npm install --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
+RUN npm ci --ignore-scripts --install-links --include=prod --include=dev --include=peer --include=optional
 
 FROM base AS production_deps
 COPY --chown=node:node ./package* ./
-RUN npm install --ignore-scripts --install-links --include=prod --omit=dev --include=peer --include=optional
+RUN npm ci --ignore-scripts --install-links --include=prod --omit=dev --include=peer --include=optional
 
 FROM development_deps AS build
 COPY --chown=node:node ./ ./
