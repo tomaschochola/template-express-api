@@ -12,5 +12,6 @@
 # environment files and secrets
 /.env
 /.secrets
-# compiled files
+
+# generated artifacts
 /dist
