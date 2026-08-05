@@ -26,7 +26,7 @@ export default new ESLintConfigBuilder()
   .enableTypeScriptProjectService({ files: typescriptFiles })
   .addTypeScriptPolicyRules({ files: typescriptFiles })
   .addRawConfig({
-    files: ['**/*.d.ts', '**/*.d.*.ts'],
+    files: filePatterns.allTypeScriptDeclarationFiles,
     rules: {
       'no-restricted-exports': 'off',
     },
