@@ -1,8 +1,8 @@
 {
+  "extends": "@tomaschochola/tooling-typescript/src/node.json",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "extends": "@tomaschochola/tooling-typescript/src/node.json",
   "include": ["./src/**/*"]
 }

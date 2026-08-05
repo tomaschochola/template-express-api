@@ -12,16 +12,29 @@
 
 import './observability.js';
 
+import { STATUS_CODES } from 'node:http';
+
 import { logs, SeverityNumber } from '@opentelemetry/api-logs';
-import { ATTR_ERROR_TYPE, ATTR_EXCEPTION_MESSAGE, ATTR_EXCEPTION_STACKTRACE, ATTR_EXCEPTION_TYPE } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_ERROR_TYPE,
+  ATTR_EXCEPTION_MESSAGE,
+  ATTR_EXCEPTION_STACKTRACE,
+  ATTR_EXCEPTION_TYPE,
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+} from '@opentelemetry/semantic-conventions';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
 import type { ErrorRequestHandler, Express, RequestHandler } from 'express';
 import express from 'express';
+import createHttpError from 'http-errors';
 
-const PORT: number = parseInt(process.env['PORT'] ?? '61400', 10);
+const port = Number(process.env['PORT'] ?? '61400');
 
-const logger = logs.getLogger('logs');
+if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+  throw new RangeError('PORT must be an integer between 1 and 65535.');
+}
+
+const logger = logs.getLogger('@tomaschochola/template-express-api');
 const app: Express = express();
 
 app.disable('x-powered-by');
@@ -31,6 +44,7 @@ app.set('view engine', 'ejs');
 
 app.use(compress());
 app.use(cookieParser());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const setSecurityHeaders: RequestHandler = (_req, res, next) => {
@@ -78,7 +92,10 @@ const setCacheControl: RequestHandler = (_req, res, next) => {
 app.use(setCacheControl);
 
 const handleOpenapi: RequestHandler = (_req, res) => {
-  res.removeHeader('Content-Security-Policy');
+  res.setHeader(
+    'Content-Security-Policy',
+    'default-src \'none\'; base-uri \'none\'; form-action \'none\'; frame-ancestors \'none\'; script-src https://cdn.jsdelivr.net; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data: blob: https:; font-src data:; connect-src \'self\'; worker-src blob:',
+  );
 
   res.render('openapi.ejs', { url: '/static/openapi.json' });
 };
@@ -114,23 +131,27 @@ const handleNotFound: RequestHandler = (_req, res, next) => {
 app.use(handleNotFound);
 
 const handleError: ErrorRequestHandler = (err, _req, res, next) => {
-  let message: string | undefined = undefined;
-
-  if (err instanceof Error) {
-    message = err.message;
-  } else if (err instanceof String || typeof err === 'string') {
-    message = err.toString();
-  }
+  const statusCode: number = createHttpError.isHttpError(err) ? err.statusCode : 500;
+  const title: string = STATUS_CODES[statusCode] ?? 'Error';
+  const errorType: string = err instanceof Error ? err.name : typeof err;
+  const message: string = err instanceof Error ? err.message : typeof err === 'string' ? err : 'Unknown error';
+  const severityNumber: SeverityNumber = statusCode < 500 ? SeverityNumber.WARN : SeverityNumber.ERROR;
+  const severityText: 'ERROR' | 'WARN' = statusCode < 500 ? 'WARN' : 'ERROR';
 
   logger.emit({
     attributes: {
-      [ATTR_ERROR_TYPE]: '500',
-      [ATTR_EXCEPTION_TYPE]: err instanceof Error ? err.name : undefined,
-      [ATTR_EXCEPTION_MESSAGE]: message,
-      [ATTR_EXCEPTION_STACKTRACE]: err instanceof Error ? err.stack : undefined,
+      [ATTR_ERROR_TYPE]: errorType,
+      [ATTR_HTTP_RESPONSE_STATUS_CODE]: statusCode,
+      ...(err instanceof Error
+        ? {
+            [ATTR_EXCEPTION_TYPE]: err.name,
+            [ATTR_EXCEPTION_MESSAGE]: err.message,
+            ...(err.stack === undefined ? {} : { [ATTR_EXCEPTION_STACKTRACE]: err.stack }),
+          }
+        : {}),
     },
-    severityNumber: SeverityNumber.ERROR,
-    severityText: 'ERROR',
+    severityNumber,
+    severityText,
     body: message,
   });
 
@@ -140,12 +161,12 @@ const handleError: ErrorRequestHandler = (err, _req, res, next) => {
     return;
   }
 
-  res.status(500).json({
+  res.status(statusCode).json({
     errors: [
       {
-        status: '500',
+        status: String(statusCode),
         code: '0',
-        title: 'Internal Server Error',
+        title,
       },
     ],
   });
@@ -153,9 +174,9 @@ const handleError: ErrorRequestHandler = (err, _req, res, next) => {
 
 app.use(handleError);
 
-app.listen(PORT, () => {
+app.listen(port, () => {
   logger.emit({
-    body: `Server listening on port ${PORT.toFixed()} on all network interfaces.`,
+    body: `Server listening on port ${String(port)} on all network interfaces.`,
     severityNumber: SeverityNumber.INFO,
     severityText: 'INFO',
   });

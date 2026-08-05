@@ -27,17 +27,19 @@
     "cookie-parser": "^1.4.7",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
+    "http-errors": "^2.0.1",
     "multer": "^2.2.0"
   },
-  "description": "@tomaschochola/template-express-api",
+  "description": "Express API template with TypeScript and OpenTelemetry observability.",
   "devDependencies": {
-    "@tomaschochola/tooling-eslint": "github:tomaschochola/tooling-eslint#1.x",
-    "@tomaschochola/tooling-prettier": "github:tomaschochola/tooling-prettier#1.x",
+    "@tomaschochola/tooling-eslint": "github:tomaschochola/tooling-eslint#2.x",
+    "@tomaschochola/tooling-prettier": "github:tomaschochola/tooling-prettier#2.x",
     "@tomaschochola/tooling-trimmer": "github:tomaschochola/tooling-trimmer#2.x",
-    "@tomaschochola/tooling-typescript": "github:tomaschochola/tooling-typescript#1.x",
+    "@tomaschochola/tooling-typescript": "github:tomaschochola/tooling-typescript#2.x",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
+    "@types/http-errors": "^2.0.5",
     "@types/multer": "^2.2.0"
   },
   "funding": {
@@ -55,8 +57,10 @@
   "license": "CC-BY-ND-4.0",
   "name": "@tomaschochola/template-express-api",
   "private": true,
-  "repository": "github:tomaschochola/template-express-api",
-  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomaschochola/template-express-api.git"
+  },
   "type": "module",
   "version": "0.0.0"
 }
