@@ -28,7 +28,7 @@ import type { ErrorRequestHandler, Express, RequestHandler } from 'express';
 import express from 'express';
 import createHttpError from 'http-errors';
 
-const port = Number(process.env['PORT'] ?? '61400');
+const port = Number(process.env['PORT'] ?? '61020');
 
 if (!Number.isInteger(port) || port < 1 || port > 65_535) {
   throw new RangeError('PORT must be an integer between 1 and 65535.');
