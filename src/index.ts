@@ -15,13 +15,7 @@ import './observability.js';
 import { STATUS_CODES } from 'node:http';
 
 import { logs, SeverityNumber } from '@opentelemetry/api-logs';
-import {
-  ATTR_ERROR_TYPE,
-  ATTR_EXCEPTION_MESSAGE,
-  ATTR_EXCEPTION_STACKTRACE,
-  ATTR_EXCEPTION_TYPE,
-  ATTR_HTTP_RESPONSE_STATUS_CODE,
-} from '@opentelemetry/semantic-conventions';
+import { ATTR_ERROR_TYPE, ATTR_EXCEPTION_MESSAGE, ATTR_EXCEPTION_STACKTRACE, ATTR_EXCEPTION_TYPE, ATTR_HTTP_RESPONSE_STATUS_CODE } from '@opentelemetry/semantic-conventions';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
 import type { ErrorRequestHandler, Express, RequestHandler } from 'express';
@@ -59,7 +53,7 @@ const setSecurityHeaders: RequestHandler = (_req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader(
     'Content-Security-Policy',
-    'default-src \'self\'; form-action \'self\'; base-uri \'self\'; object-src \'none\'; style-src \'self\'; font-src \'self\'; frame-ancestors \'none\'; upgrade-insecure-requests',
+    "default-src 'self'; form-action 'self'; base-uri 'self'; object-src 'none'; style-src 'self'; font-src 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
   );
   res.setHeader('X-DNS-Prefetch-Control', 'off');
   res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
@@ -94,7 +88,7 @@ app.use(setCacheControl);
 const handleOpenapi: RequestHandler = (_req, res) => {
   res.setHeader(
     'Content-Security-Policy',
-    'default-src \'none\'; base-uri \'none\'; form-action \'none\'; frame-ancestors \'none\'; script-src https://cdn.jsdelivr.net; style-src \'self\' \'unsafe-inline\'; img-src \'self\' data: blob: https:; font-src data:; connect-src \'self\'; worker-src blob:',
+    "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; script-src https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src data:; connect-src 'self'; worker-src blob:",
   );
 
   res.render('openapi.ejs', { url: '/static/openapi.json' });
@@ -134,7 +128,14 @@ const handleError: ErrorRequestHandler = (err, _req, res, next) => {
   const statusCode: number = createHttpError.isHttpError(err) ? err.statusCode : 500;
   const title: string = STATUS_CODES[statusCode] ?? 'Error';
   const errorType: string = err instanceof Error ? err.name : typeof err;
-  const message: string = err instanceof Error ? err.message : typeof err === 'string' ? err : 'Unknown error';
+  let message: string = 'Unknown error';
+
+  if (err instanceof Error) {
+    message = err.message;
+  } else if (typeof err === 'string') {
+    message = err;
+  }
+
   const severityNumber: SeverityNumber = statusCode < 500 ? SeverityNumber.WARN : SeverityNumber.ERROR;
   const severityText: 'ERROR' | 'WARN' = statusCode < 500 ? 'WARN' : 'ERROR';
 
