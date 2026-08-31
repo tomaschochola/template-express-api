@@ -1,35 +1,35 @@
 {
-  "openapi": "3.1.1",
-  "info": {
-    "title": "Express API",
-    "description": "OpenAPI definition for the Express API template.",
-    "version": "0.0.0",
-    "contact": {
-      "name": "Tomáš Chochola",
-      "url": "https://github.com/tomaschochola",
-      "email": "tomaschochola@tomaschochola.cz"
-    },
-    "license": {
-      "name": "CC-BY-ND-4.0",
-      "identifier": "CC-BY-ND-4.0"
-    }
-  },
-  "servers": [
-    {
-      "url": "/"
-    }
-  ],
-  "paths": {
-    "/healthz/live": {
-      "get": {
-        "operationId": "healthzLive",
-        "summary": "Check process liveness",
-        "responses": {
-          "200": {
-            "description": "The process is alive."
-          }
+    "openapi": "3.1.1",
+    "info": {
+        "title": "Express API",
+        "description": "OpenAPI definition for the Express API template.",
+        "version": "0.0.0",
+        "contact": {
+            "name": "Tomáš Chochola",
+            "url": "https://github.com/tomaschochola",
+            "email": "tomaschochola@tomaschochola.cz"
+        },
+        "license": {
+            "name": "CC-BY-ND-4.0",
+            "identifier": "CC-BY-ND-4.0"
         }
-      }
+    },
+    "servers": [
+        {
+            "url": "/"
+        }
+    ],
+    "paths": {
+        "/healthz/live": {
+            "get": {
+                "operationId": "healthzLive",
+                "summary": "Check process liveness",
+                "responses": {
+                    "200": {
+                        "description": "The process is alive."
+                    }
+                }
+            }
+        }
     }
-  }
 }

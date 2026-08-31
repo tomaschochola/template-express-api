@@ -17,16 +17,16 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { ConsoleSpanExporter } from '@opentelemetry/sdk-trace-base';
 
 const sdk = new NodeSDK({
-  traceExporter: new ConsoleSpanExporter(),
-  metricReader: new PeriodicExportingMetricReader({
-    exporter: new ConsoleMetricExporter(),
-  }),
-  logRecordProcessors: [
-    new SimpleLogRecordProcessor({
-      exporter: new ConsoleLogRecordExporter(),
+    traceExporter: new ConsoleSpanExporter(),
+    metricReader: new PeriodicExportingMetricReader({
+        exporter: new ConsoleMetricExporter(),
     }),
-  ],
-  instrumentations: [getNodeAutoInstrumentations()],
+    logRecordProcessors: [
+        new SimpleLogRecordProcessor({
+            exporter: new ConsoleLogRecordExporter(),
+        }),
+    ],
+    instrumentations: [getNodeAutoInstrumentations()],
 });
 
 sdk.start();
