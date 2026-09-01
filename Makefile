@@ -34,7 +34,7 @@ DEVCONTAINER_FILTER := label=devcontainer.local_folder=$(CURDIR)
 fix: eslint_fix prettier_fix trimmer_fix
 
 .PHONY: check
-check: doctor lint analyze build audit
+check: doctor lint analyze all audit
 
 .PHONY: doctor
 doctor: git_check npm_config_check npm_doctor
@@ -53,20 +53,20 @@ update: npm_config_check ./package.json ./package-lock.json npm_update
 
 .PHONY: clean
 clean:
-	rm -rf ./dist
+	rm --force --recursive --one-file-system -- ./dist
 
 .PHONY: distclean
 distclean: clean deps_clean
 
-.PHONY: build
-build: ./node_modules/.package-lock.json ./package.json ./package-lock.json ./tsconfig.json clean
+.PHONY: all
+all: ./node_modules/.package-lock.json ./package.json ./package-lock.json ./tsconfig.json clean
 	npm exec --no --ignore-scripts -- tsc --project ./tsconfig.json
 
 .PHONY: postcreate
 postcreate: deps_install
 
 .PHONY: start serve server dev
-start serve server dev: build
+start serve server dev: all
 	node ./dist/index.js
 
 .PHONY: up
@@ -147,7 +147,7 @@ npm_check: npm_config_check ./node_modules/.package-lock.json
 
 .PHONY: npm_audit
 npm_audit: npm_config_check ./node_modules/.package-lock.json ./package.json ./package-lock.json
-	npm audit --ignore-scripts --audit-level=high --install-links --include=prod --include=dev --include=peer --include=optional
+	npm audit --ignore-scripts --audit-level=moderate --install-links --include=prod --include=dev --include=peer --include=optional
 
 .PHONY: npm_install
 npm_install: npm_config_check ./package.json ./package-lock.json
@@ -159,7 +159,7 @@ npm_update: npm_config_check ./package.json ./package-lock.json npm_clean
 
 .PHONY: npm_clean
 npm_clean:
-	rm -rf ./node_modules
+	rm --force --recursive --one-file-system -- ./node_modules
 
 .PHONY: git_check
 git_check:
