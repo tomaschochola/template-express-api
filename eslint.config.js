@@ -12,15 +12,15 @@
 
 import { ESLintConfigBuilder, filePatterns } from '@tomaschochola/tooling-eslint';
 
-const typescriptFiles = [...filePatterns.allTypeScriptFiles, ...filePatterns.allTsxFiles];
-const javascriptFiles = [...filePatterns.allJavaScriptFiles, ...filePatterns.allJsxFiles];
+const typescriptFiles = [...filePatterns.typescript, ...filePatterns.tsx];
 
 export default new ESLintConfigBuilder()
-    .addNodeGlobals()
+    .addNodeGlobals({ files: filePatterns.scripts })
     .addGitIgnoreFile(import.meta.url)
-    .addJavaScriptRecommendedRules()
-    .addTypeScriptStrictTypeCheckedRules({ files: typescriptFiles })
+    .addJavaScriptRecommendedRules({ files: filePatterns.scripts })
+    .addTypeScriptRecommendedTypeCheckedRules({ files: typescriptFiles })
+    // .addTypeScriptStrictTypeCheckedRules({ files: typescriptFiles })
+    // .addTypeScriptOpinionatedTypeCheckedRules({ files: typescriptFiles })
     .enableTypeScriptProjectService({ files: typescriptFiles })
-    .disableTypeScriptTypeChecking({ files: javascriptFiles })
-    .addSonarJsRecommendedRules()
+    // .addSonarJsRecommendedRules({ files: filePatterns.scripts })
     .toConfig();
