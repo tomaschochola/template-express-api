@@ -1,8 +1,8 @@
 {
     "openapi": "3.1.1",
     "info": {
-        "title": "tomaschochola/template-express-api",
-        "description": "Express API template with TypeScript and OpenTelemetry observability.",
+        "title": "github.com/tomaschochola/template-express-api",
+        "description": "github.com/tomaschochola/template-express-api",
         "version": "0.0.0",
         "contact": {
             "name": "Tomáš Chochola",
@@ -10,8 +10,8 @@
             "email": "tomaschochola@tomaschochola.cz"
         },
         "license": {
-            "name": "CC-BY-ND-4.0",
-            "identifier": "CC-BY-ND-4.0"
+            "name": "BSD-3-Clause",
+            "identifier": "BSD-3-Clause"
         }
     },
     "servers": [

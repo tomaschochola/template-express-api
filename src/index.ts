@@ -114,9 +114,9 @@ app.use(handleNotFound);
 
 const handleError: ErrorRequestHandler = (err, _req, res, next) => {
     const statusCode: number = createHttpError.isHttpError(err) ? err.statusCode : 500;
-    const title: string = STATUS_CODES[statusCode] ?? 'Error';
+    const title: string = STATUS_CODES[statusCode] ?? 'Unexpected Error';
     const errorType: string = err instanceof Error ? err.name : typeof err;
-    let message: string = 'Unknown error';
+    let message: string = 'Unexpected Error';
 
     if (err instanceof Error) {
         message = err.message;
