@@ -30,7 +30,7 @@
         "http-errors": "^2.0.1",
         "multer": "^2.3.0"
     },
-    "description": "Express API template with TypeScript and OpenTelemetry observability.",
+    "description": "github.com/tomaschochola/template-express-api",
     "devDependencies": {
         "@tomaschochola/tooling-eslint": "git+https://github.com/tomaschochola/tooling-eslint.git#main",
         "@tomaschochola/tooling-prettier": "git+https://github.com/tomaschochola/tooling-prettier.git#main",
